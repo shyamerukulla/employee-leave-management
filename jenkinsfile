@@ -2,10 +2,6 @@ pipeline {
 
     agent any
 
-    tools {
-        nodejs 'NodeJS-18'
-    }
-
     environment {
         APP_NAME    = 'employee-leave-app'
         APP_VERSION = '1.0'
