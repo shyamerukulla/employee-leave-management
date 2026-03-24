@@ -1,0 +1,55 @@
+pipeline {
+
+    agent any
+
+    tools {
+        nodejs 'NodeJS-18'
+    }
+
+    environment {
+        APP_NAME    = 'employee-leave-app'
+        APP_VERSION = '1.0'
+    }
+
+    stages {
+
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing dependencies...'
+                sh 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                echo 'Running tests...'
+                sh 'npm test'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                sh 'docker build -t ${APP_NAME}:${APP_VERSION} .'
+            }
+        }
+
+        stage('Verify Image') {
+            steps {
+                echo 'Verifying image...'
+                sh 'docker images ${APP_NAME}'
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo '✅ Pipeline PASSED!'
+        }
+        failure {
+            echo '❌ Pipeline FAILED!'
+        }
+    }
+
+}
