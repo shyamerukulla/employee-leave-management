@@ -2,12 +2,11 @@ trigger:
 - main
 
 pool:
-  name: Default   # your self-hosted agent
+  name: Default
 
 variables:
   APP_NAME: employee-leave-management
   APP_VERSION: latest
-  DOCKER_USERNAME: shyamerukulla   # 🔴 CHANGE THIS
 
 steps:
 
@@ -29,18 +28,6 @@ steps:
     docker build -t $(APP_NAME):$(APP_VERSION) .
   displayName: Build Docker Image
 
-# 🔹 Tag image for Docker Hub
-- script: |
-    echo "Tagging Docker image..."
-    docker tag $(APP_NAME):$(APP_VERSION) $(DOCKER_USERNAME)/$(APP_NAME):$(APP_VERSION)
-  displayName: Tag Image
-
-# 🔹 Push image
-- script: |
-    echo "Pushing image to Docker Hub..."
-    docker push $(DOCKER_USERNAME)/$(APP_NAME):$(APP_VERSION)
-  displayName: Push Image
-
 # 🔹 Stop old container (important)
 - script: |
     echo "Stopping old container if exists..."
@@ -48,7 +35,7 @@ steps:
     docker rm $(APP_NAME) || true
   displayName: Stop Old Container
 
-# 🔹 Run new container (use different port if needed)
+# 🔹 Run new container (use different port)
 - script: |
     echo "Running new container..."
     docker run -d -p 3001:3000 --name $(APP_NAME) $(APP_NAME):$(APP_VERSION)
