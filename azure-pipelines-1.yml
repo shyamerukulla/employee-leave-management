@@ -1,0 +1,21 @@
+trigger:
+- main
+
+pool:
+  name: Default
+
+steps:
+- script: echo "Installing dependencies"
+  displayName: Install
+
+- script: npm install
+  displayName: Install Dependencies
+
+- script: npm test
+  displayName: Run Tests
+
+- script: docker build -t employee-leave-management .
+  displayName: Build Docker Image
+
+- script: docker run -d -p 3000:3000 employee-leave-management
+  displayName: Run Container
