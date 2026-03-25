@@ -2,20 +2,60 @@ trigger:
 - main
 
 pool:
-  name: Default
+  name: Default   # your self-hosted agent
+
+variables:
+  APP_NAME: employee-leave-management
+  APP_VERSION: latest
+  DOCKER_USERNAME: shyamsundererukulla21@gmail.com   # 🔴 CHANGE THIS
 
 steps:
-- script: echo "Installing dependencies"
-  displayName: Install
 
-- script: npm install
+# 🔹 Install dependencies
+- script: |
+    echo "Installing dependencies..."
+    npm install
   displayName: Install Dependencies
 
-- script: npm test
+# 🔹 Run tests
+- script: |
+    echo "Running tests..."
+    npm test
   displayName: Run Tests
 
-- script: docker build -t employee-leave-management .
+# 🔹 Build Docker image
+- script: |
+    echo "Building Docker image..."
+    docker build -t $(APP_NAME):$(APP_VERSION) .
   displayName: Build Docker Image
 
-- script: docker run -d -p 3000:3000 employee-leave-management
+# 🔹 Tag image for Docker Hub
+- script: |
+    echo "Tagging Docker image..."
+    docker tag $(APP_NAME):$(APP_VERSION) $(DOCKER_USERNAME)/$(APP_NAME):$(APP_VERSION)
+  displayName: Tag Image
+
+# 🔹 Push image
+- script: |
+    echo "Pushing image to Docker Hub..."
+    docker push $(DOCKER_USERNAME)/$(APP_NAME):$(APP_VERSION)
+  displayName: Push Image
+
+# 🔹 Stop old container (important)
+- script: |
+    echo "Stopping old container if exists..."
+    docker stop $(APP_NAME) || true
+    docker rm $(APP_NAME) || true
+  displayName: Stop Old Container
+
+# 🔹 Run new container (use different port if needed)
+- script: |
+    echo "Running new container..."
+    docker run -d -p 3001:3000 --name $(APP_NAME) $(APP_NAME):$(APP_VERSION)
   displayName: Run Container
+
+# 🔹 Verify
+- script: |
+    echo "Verifying container..."
+    docker ps | grep $(APP_NAME)
+  displayName: Verify Container
