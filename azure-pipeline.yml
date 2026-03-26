@@ -1,52 +1,22 @@
 trigger:
   - main
 
-variables:
-  dockerHubUsername: 'shyamerukulla'
-  imageName: 'employee-leave-app'
-  imageTag: '$(Build.BuildId)'
+pool:
+  name: Default
 
-stages:
+steps:
 
-  - stage: Build
-    displayName: 'Build and Test'
-    jobs:
-      - job: BuildJob
-        displayName: 'Install Test and Build'
-        pool:
-          name: Default
-        steps:
+  - script: npm install
+    displayName: 'Install dependencies'
 
-          - script: npm install
-            displayName: 'Install dependencies'
+  - script: npm test
+    displayName: 'Run automated tests'
 
-          - script: npm test
-            displayName: 'Run automated tests'
+  - script: DOCKER_BUILDKIT=0 docker build -t shyamerukulla/employee-leave-app:latest -f Dockerfile .
+    displayName: 'Build Docker image'
 
-          - script: |
-              docker build -t $(dockerHubUsername)/$(imageName):$(imageTag) .
-              docker build -t $(dockerHubUsername)/$(imageName):latest .
-            displayName: 'Build Docker image'
+  - script: echo $(dockerHubPassword) | docker login --username shyamerukulla --password-stdin
+    displayName: 'Login to Docker Hub'
 
-  - stage: Push
+  - script: docker push shyamerukulla/employee-leave-app:latest
     displayName: 'Push to Docker Hub'
-    dependsOn: Build
-    condition: succeeded()
-    jobs:
-      - job: PushJob
-        displayName: 'Push image to Docker Hub'
-        pool:
-          name: Default
-        steps:
-
-          - task: Docker@2
-            displayName: 'Build and push to Docker Hub'
-            inputs:
-              command: 'buildAndPush'
-              repository: '$(dockerHubUsername)/$(imageName)'
-              dockerfile: '$(Build.SourcesDirectory)/dockerfile'
-              buildContext: '$(Build.SourcesDirectory)'
-              containerRegistry: 'DockerHub-Connection'
-              tags: |
-                $(imageTag)
-                latest
