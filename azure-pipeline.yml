@@ -2,7 +2,7 @@ trigger:
   - main
 
 variables:
-  dockerHubUsername: 'shyamerukulla'
+  dockerHubUsername: 'YOUR_DOCKERHUB_USERNAME'
   imageName: 'employee-leave-app'
   imageTag: '$(Build.BuildId)'
 
@@ -44,7 +44,8 @@ stages:
             inputs:
               command: 'buildAndPush'
               repository: '$(dockerHubUsername)/$(imageName)'
-              dockerfile: 'Dockerfile'
+              dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+              buildContext: '$(Build.SourcesDirectory)'
               containerRegistry: 'DockerHub-Connection'
               tags: |
                 $(imageTag)
