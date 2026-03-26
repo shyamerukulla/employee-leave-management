@@ -1,11 +1,8 @@
 trigger:
   - main
 
-pool:
-  vmImage: 'ubuntu-latest'
-
 variables:
-  dockerHubUsername: 'shyamsundererukulla21@gmail.com'
+  dockerHubUsername: 'shyamerukulla'
   imageName: 'employee-leave-app'
   imageTag: '$(Build.BuildId)'
 
@@ -16,28 +13,19 @@ stages:
     jobs:
       - job: BuildJob
         displayName: 'Install Test and Build'
+        pool:
+          name: Default
         steps:
 
-          - task: NodeTool@0
-            inputs:
-              versionSpec: '18.x'
-            displayName: 'Install Node.js 18'
-
-          - script: |
-              echo 'Installing dependencies...'
-              npm install
+          - script: npm install
             displayName: 'Install dependencies'
 
-          - script: |
-              echo 'Running automated tests...'
-              npm test
-            displayName: 'Run 13 automated tests'
+          - script: npm test
+            displayName: 'Run automated tests'
 
           - script: |
-              echo 'Building Docker image...'
               docker build -t $(dockerHubUsername)/$(imageName):$(imageTag) .
               docker build -t $(dockerHubUsername)/$(imageName):latest .
-              echo 'Docker image built successfully!'
             displayName: 'Build Docker image'
 
   - stage: Push
@@ -47,10 +35,12 @@ stages:
     jobs:
       - job: PushJob
         displayName: 'Push image to Docker Hub'
+        pool:
+          name: Default
         steps:
 
           - task: Docker@2
-            displayName: 'Login and push to Docker Hub'
+            displayName: 'Build and push to Docker Hub'
             inputs:
               command: 'buildAndPush'
               repository: '$(dockerHubUsername)/$(imageName)'
