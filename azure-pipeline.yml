@@ -2,7 +2,7 @@ trigger:
   - main
 
 variables:
-  dockerHubUsername: 'YOUR_DOCKERHUB_USERNAME'
+  dockerHubUsername: 'shyamerukulla'
   imageName: 'employee-leave-app'
   imageTag: '$(Build.BuildId)'
 
