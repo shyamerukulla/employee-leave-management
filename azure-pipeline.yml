@@ -44,7 +44,7 @@ stages:
             inputs:
               command: 'buildAndPush'
               repository: '$(dockerHubUsername)/$(imageName)'
-              dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+              dockerfile: '$(Build.SourcesDirectory)/dockerfile'
               buildContext: '$(Build.SourcesDirectory)'
               containerRegistry: 'DockerHub-Connection'
               tags: |
