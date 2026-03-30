@@ -15,7 +15,7 @@ steps:
   - script: DOCKER_BUILDKIT=0 docker build -t shyamerukulla/employee-leave-app:latest -f Dockerfile .
     displayName: 'Build Docker image'
 
-  - script: echo $(dockerHubPassword) | docker login --username shyamerukulla --password-stdin
+  - script: docker login --username shyamerukulla --password $(dockerHubPassword)
     displayName: 'Login to Docker Hub'
 
   - script: docker push shyamerukulla/employee-leave-app:latest
